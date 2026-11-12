@@ -766,20 +766,33 @@ button:focus-visible { outline: 3px solid var(--aviso); outline-offset: 2px; }
   background: var(--piedra) center / contain no-repeat; border: 0; border-radius: 50%; box-shadow: none;
   filter: drop-shadow(0 4px 3px rgba(40, 25, 10, .45));
 }
-.zona-mapa.con-piedras .nodo.cerrado { background-image: var(--piedra-cerrada); }
-.zona-mapa.con-piedras .nodo.actual {
-  width: clamp(84px, 17.6cqw, 150px); height: clamp(84px, 17.6cqw, 150px); background-image: var(--piedra-actual);
-  filter: drop-shadow(0 0 6px rgba(255, 200, 80, .85)) drop-shadow(0 4px 3px rgba(40, 25, 10, .45));
+/* Jerarquía (JR, 12 de noviembre de 2026): lo cerrado, apagado y más pequeño, para que no mande sobre el mapa; el
+   nivel actual es el protagonista: la piedra abierta, mayor, con un aro de luz dorada que late y sin estrellas vacías. */
+.zona-mapa.con-piedras .nodo.cerrado {
+  width: clamp(54px, 11.5cqw, 100px); height: clamp(54px, 11.5cqw, 100px); background-image: var(--piedra-cerrada);
+  opacity: .72; filter: saturate(.6) brightness(1.12) drop-shadow(0 3px 2px rgba(40, 25, 10, .3));
 }
+.zona-mapa.con-piedras .nodo.cerrado .nodo-num svg { width: 36%; height: 36%; opacity: .8; }
+/* El aro del nivel actual: claro por dentro y dorado por fuera, para que se vea también sobre la hierba amarilla; la
+   piedra ocupa el 85 % de su imagen, así que el aro va justo en su canto. */
+.zona-mapa.con-piedras .nodo.actual { width: clamp(84px, 17.6cqw, 150px); height: clamp(84px, 17.6cqw, 150px); }
+.zona-mapa.con-piedras .nodo.actual::before {
+  content: ''; position: absolute; inset: 5%; border-radius: 50%; z-index: -1; pointer-events: none;
+  border: 3px solid #fff6c8; box-shadow: 0 0 0 3px #f2a91e, 0 0 16px 6px rgba(255, 200, 60, .85);
+  animation: luz-actual 1.4s ease-in-out infinite;
+}
+@keyframes luz-actual { 0%, 100% { opacity: .75; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .zona-mapa.con-piedras .nodo.actual::before { animation: none; } }
+.zona-mapa.con-piedras .nodo.actual.sin-estrellas .nodo-estrellas { display: none; }
 .zona-mapa.con-piedras .nodo:active { box-shadow: none; }
 .zona-mapa.con-piedras .nodo-num {
   color: #f3ead9; transform: translateY(6%);
   text-shadow: 0 -.045em 0 rgba(35, 25, 18, .85), 0 .045em 0 rgba(255, 245, 230, .35);
 }
 .zona-mapa.con-piedras .nodo-num svg.icono { color: #f3ead9; filter: drop-shadow(0 -1px 0 rgba(35, 25, 18, .85)) drop-shadow(0 1px 0 rgba(255, 245, 230, .35)); }
-.zona-mapa.con-piedras .nodo-estrellas { bottom: 4%; transform: translateY(50%); gap: 0; }
+.zona-mapa.con-piedras .nodo-estrellas { bottom: 2%; transform: translateY(55%); gap: 0; }
 .zona-mapa.con-piedras .nodo-estrellas i {
-  width: clamp(18px, 3.6cqw, 32px); height: clamp(18px, 3.6cqw, 32px); font-size: 0; color: transparent; text-shadow: none;
+  width: clamp(25px, 5.2cqw, 44px); height: clamp(25px, 5.2cqw, 44px); margin: 0 -1px; font-size: 0; color: transparent; text-shadow: none;
   background: var(--estrella-vacia) center / contain no-repeat;
 }
 .zona-mapa.con-piedras .nodo-estrellas i.on { background-image: var(--estrella); }
@@ -1481,7 +1494,7 @@ summary:focus-visible, input:focus-visible, select:focus-visible, textarea:focus
     <div class="muestra-iconos">${Fi.map(l=>J(A(l),d(Tn[l]))).join("")}</div>
   </div>`,a.app.querySelector("#m-volver").addEventListener("click",()=>a.volver())}var Ke={};var kn=104,Vn=90,Hn=150,Ze=230,Sn=a=>50+27*Math.sin(a*.85);function Je(a){let e=`M${a[0][0].toFixed(1)} ${a[0][1].toFixed(0)}`;for(let r=1;r<a.length-1;r++){let i=[(a[r][0]+a[r+1][0])/2,(a[r][1]+a[r+1][1])/2];e+=` Q${a[r][0].toFixed(1)} ${a[r][1].toFixed(0)} ${i[0].toFixed(1)} ${i[1].toFixed(0)}`}let o=a[a.length-1];return`${e} L${o[0].toFixed(1)} ${o[1].toFixed(0)}`}var Dn=(a,e,o="")=>`<svg class="sendero ${o}" viewBox="0 0 100 ${a}" preserveAspectRatio="none" aria-hidden="true">
     <path class="sendero-base" d="${Je(e)}"/><path class="sendero-linea" d="${Je(e)}"/></svg>`,Rb=(a,e,o,r)=>`<div class="portal-epoca ${e?"abierto":"cerrado"} ${o?"se-abre":""}" style="top:${a}px" role="img"
-    aria-label="${v(e?d("portal_abierto",{epoca:r}):d("portal_cerrado",{epoca:r}))}"><span class="portal-aro"></span></div>`;function wn(a,e,o,r){let i=a.niveles[e],t=G.indexOf(i),l=r.estrellas[i.id]??0,c=r.abierto(t),n=c?t===r.actual?"actual":l>0?"hecho":"":"cerrado",b=`<span class="nodo-estrellas" aria-hidden="true">${[0,1,2].map(u=>`<i class="${u<l?"on":""}">\u2605</i>`).join("")}</span>`;return`<button class="nodo ${n} ${r.llega===t?"se-abre":""}" data-nivel="${t}" style="${o}" ${c?"":'aria-disabled="true"'}
+    aria-label="${v(e?d("portal_abierto",{epoca:r}):d("portal_cerrado",{epoca:r}))}"><span class="portal-aro"></span></div>`;function wn(a,e,o,r){let i=a.niveles[e],t=G.indexOf(i),l=r.estrellas[i.id]??0,c=r.abierto(t),n=c?t===r.actual?"actual":l>0?"hecho":"":"cerrado",b=`<span class="nodo-estrellas" aria-hidden="true">${[0,1,2].map(u=>`<i class="${u<l?"on":""}">\u2605</i>`).join("")}</span>`;return`<button class="nodo ${n}${c&&!l?" sin-estrellas":""} ${r.llega===t?"se-abre":""}" data-nivel="${t}" style="${o}" ${c?"":'aria-disabled="true"'}
     aria-label="${v(d("nivel",{id:a.inicio+e,nombre:E(i.nombre)}))}. ${c?d("estrellas_aria",{n:l}):d("bloqueado")}">
     ${t===r.actual?`<span class="nodo-avatar ${r.llega===t?"llega":""}">${r.avatar}</span>`:""}
     <span class="nodo-num">${c?a.inicio+e:r.candado}</span>${c?b:""}</button>`}function Lb(a,e,o,r,i){let t=([_,L])=>`left:${(_*100).toFixed(1)}%;top:${(L*100).toFixed(2)}%`,l=e.tutorial&&o.tutorial,n=(e.tutorial&&l?`<button class="nodo nodo-tutorial ${l.actual?"actual":l.hecho?"hecho":""}" data-tutorial style="${t(e.tutorial)}"
