@@ -716,9 +716,11 @@ button:focus-visible { outline: 3px solid var(--aviso); outline-offset: 2px; }
 .zona-nubes { background: linear-gradient(#f3f6f8, #dfe7ee); }
 /* UX-34 (solo en la 1.0): el tramo de la época es su mapa largo (su proporción, en --alto). Ocupa el ancho de la pantalla, como mucho el
    70 % del alto (unos 3 niveles por pantalla); en las pantallas anchas va centrado y a los lados, el mismo mapa difuminado. */
-.zona-mapa { background: #7fa14a; }
+.zona-mapa { background: #7fa14a; overflow: visible; }
+/* La zona no recorta lo que sale (el portal de la unión sale por arriba, sobre la época siguiente), así que el
+   difuminado de los lados no puede sobresalir: ocupa la zona justa, sobre el verde, y se clarea un poco en los bordes. */
 .zona-mapa::before {
-  content: ""; position: absolute; inset: -40px; background: var(--mapa, none) center / 100% 100%;
+  content: ""; position: absolute; inset: 0; background: var(--mapa, none) center / 100% 100%;
   filter: blur(22px) saturate(.85) brightness(.92); pointer-events: none;
 }
 .mapa-columna {
@@ -735,6 +737,12 @@ button:focus-visible { outline: 3px solid var(--aviso); outline-offset: 2px; }
 .mapa-descansillo { fill: #e8cf9c; stroke: #5f8a33; stroke-width: 8; }
 .mapa-portal-luz { fill: rgba(170, 225, 255, .45); }
 .mapa-portal { fill: #bfe8ff; stroke: #4fb3ff; stroke-width: 12; }
+/* El portal de la unión entre épocas (UX-34): de pie sobre la salida del camino, unos 440 px de alto en el mapa de 1024
+   de ancho (43 % del ancho). La imagen tiene 30 de sus 920 filas por debajo de la base del óvalo. */
+.mapa-portal-union {
+  position: absolute; height: 46cqw; width: auto; transform: translate(-50%, -96.7%); z-index: 2; pointer-events: none;
+  filter: drop-shadow(0 0 2.5cqw rgba(110, 200, 255, .7));
+}
 /* Piedras de los niveles (provisionales en CSS hasta que se aprueben las de ChatGPT, E139–E141) */
 .zona-mapa .nodo {
   background: radial-gradient(circle at 42% 36%, #c9b8aa, #a89282 58%, #7d6b5e); border: 3px solid #5e5047; color: #fff;
@@ -1448,11 +1456,11 @@ summary:focus-visible, input:focus-visible, select:focus-visible, textarea:focus
     aria-label="${v(e?c("portal_abierto",{epoca:r}):c("portal_cerrado",{epoca:r}))}"><span class="portal-aro"></span></div>`;function Dn(a,e,o,r){let i=a.niveles[e],t=W.indexOf(i),l=r.estrellas[i.id]??0,n=r.abierto(t),d=n?t===r.actual?"actual":l>0?"hecho":"":"cerrado",b=`<span class="nodo-estrellas" aria-hidden="true">${[0,1,2].map(u=>`<i class="${u<l?"on":""}">\u2605</i>`).join("")}</span>`;return`<button class="nodo ${d} ${r.llega===t?"se-abre":""}" data-nivel="${t}" style="${o}" ${n?"":'aria-disabled="true"'}
     aria-label="${v(c("nivel",{id:a.inicio+e,nombre:P(i.nombre)}))}. ${n?c("estrellas_aria",{n:l}):c("bloqueado")}">
     ${t===r.actual?`<span class="nodo-avatar ${r.llega===t?"llega":""}">${r.avatar}</span>`:""}
-    <span class="nodo-num">${n?a.inicio+e:r.candado}</span>${n?b:""}</button>`}function Eb(a,e,o,r,i){let t=a.niveles.map((p,f)=>Dn(a,f,`left:${(e.niveles[f][0]*100).toFixed(1)}%;top:${(e.niveles[f][1]*100).toFixed(2)}%`,o)).join(""),l=1024,n=Math.round(l*e.proporcion),d=[e.entrada,...e.niveles,e.salida].map(([p,f])=>[p*l,f*n]),b=([p,f])=>`<ellipse class="mapa-portal-luz" cx="${p*l}" cy="${f*n}" rx="120" ry="140"/><ellipse class="mapa-portal" cx="${p*l}" cy="${f*n}" rx="62" ry="84"/>`,u=e.imagen?"":`<svg class="mapa-provisional" viewBox="0 0 ${l} ${n}" aria-hidden="true">
+    <span class="nodo-num">${n?a.inicio+e:r.candado}</span>${n?b:""}</button>`}function Eb(a,e,o,r,i){let t=a.niveles.map((f,C)=>Dn(a,C,`left:${(e.niveles[C][0]*100).toFixed(1)}%;top:${(e.niveles[C][1]*100).toFixed(2)}%`,o)).join(""),l=1024,n=Math.round(l*e.proporcion),d=[e.entrada,...e.niveles,e.salida].map(([f,C])=>[f*l,C*n]),b=([f,C])=>`<ellipse class="mapa-portal-luz" cx="${f*l}" cy="${C*n}" rx="120" ry="140"/><ellipse class="mapa-portal" cx="${f*l}" cy="${C*n}" rx="62" ry="84"/>`,u=e.imagen?"":`<svg class="mapa-provisional" viewBox="0 0 ${l} ${n}" aria-hidden="true">
     <path class="mapa-camino-borde" d="${Qe(d)}"/><path class="mapa-camino" d="${Qe(d)}"/>
-    ${d.slice(1,-1).map(([p,f])=>`<circle class="mapa-descansillo" cx="${p}" cy="${f}" r="64"/>`).join("")}
-    ${b(e.entrada)}${b(e.salida)}</svg>`,m=r?c("portal_abierto",{epoca:i}):c("portal_cerrado",{epoca:i});return`<section class="zona zona-mapa${e.imagen?"":" provisional"}" style="--alto:${e.proporcion};--recorte:${e.recorte}${e.imagen?`;--mapa:url(${e.imagen})`:""}" aria-label="${v(`${i}. ${m}`)}">
-    <div class="mapa-columna">${u}${t}</div></section>`}function wn(a,e){let o=Ca.findIndex((i,t)=>e(t)&&!(a[i.id]>0));if(o>=0)return o;let r=0;return Ca.forEach((i,t)=>{e(t)&&(r=t)}),r}function zn(a){let e=[],o=[...ao].sort((r,i)=>va(r)-va(i));for(let r of o){let i=r.niveles.length,t=kn+(i-1)*Mn+Vn,l=f=>t-kn-f*Mn,n=P($a[va(r)].nombre),d=r.niveles.every(f=>(a.estrellas[f.id]??0)>0),b=Tn[r.epoca??""];if(b){e.push(Eb(r,b,a,d,n));continue}let u=r.niveles.map((f,C)=>Dn(r,C,`left:${Hn(W.indexOf(f)).toFixed(1)}%;top:${l(C)}px`,a)).join(""),m=Vn*.45,p=[[50,t],...r.niveles.map((f,C)=>[Hn(W.indexOf(f)),l(C)]),[50,m],[50,0]];e.push(`<section class="zona" style="height:${t}px" aria-label="${v(n)}"><div class="pista-camino">
+    ${d.slice(1,-1).map(([f,C])=>`<circle class="mapa-descansillo" cx="${f}" cy="${C}" r="64"/>`).join("")}
+    ${b(e.entrada)}${e.portal?"":b(e.salida)}</svg>`,m=e.portal?`<img class="mapa-portal-union" src="${e.portal}" alt="" aria-hidden="true" style="left:${(e.salida[0]*100).toFixed(1)}%;top:${(e.salida[1]*100).toFixed(2)}%">`:"",p=r?c("portal_abierto",{epoca:i}):c("portal_cerrado",{epoca:i});return`<section class="zona zona-mapa${e.imagen?"":" provisional"}" style="--alto:${e.proporcion};--recorte:${e.recorte}${e.imagen?`;--mapa:url(${e.imagen})`:""}" aria-label="${v(`${i}. ${p}`)}">
+    <div class="mapa-columna">${u}${m}${t}</div></section>`}function wn(a,e){let o=Ca.findIndex((i,t)=>e(t)&&!(a[i.id]>0));if(o>=0)return o;let r=0;return Ca.forEach((i,t)=>{e(t)&&(r=t)}),r}function zn(a){let e=[],o=[...ao].sort((r,i)=>va(r)-va(i));for(let r of o){let i=r.niveles.length,t=kn+(i-1)*Mn+Vn,l=f=>t-kn-f*Mn,n=P($a[va(r)].nombre),d=r.niveles.every(f=>(a.estrellas[f.id]??0)>0),b=Tn[r.epoca??""];if(b){e.push(Eb(r,b,a,d,n));continue}let u=r.niveles.map((f,C)=>Dn(r,C,`left:${Hn(W.indexOf(f)).toFixed(1)}%;top:${l(C)}px`,a)).join(""),m=Vn*.45,p=[[50,t],...r.niveles.map((f,C)=>[Hn(W.indexOf(f)),l(C)]),[50,m],[50,0]];e.push(`<section class="zona" style="height:${t}px" aria-label="${v(n)}"><div class="pista-camino">
       ${Sn(t,p)}${u}${$b(m,d,d&&!!a.portalNuevo?.(r.id),n)}</div></section>`)}return o.length<$a.length&&e.push(`<section class="zona zona-nubes" style="height:${We}px" aria-label="${v(c("pronto"))}"><div class="pista-camino">
       ${Sn(We,[[50,We],[50,We*.4]],"en-nubes")}</div>
       <div class="nubes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div></section>`),`<div class="camino">${e.reverse().join("")}</div>`}var Ab=`<svg viewBox="-1 -1 2 2" aria-hidden="true"><circle r=".95" fill="#fff" stroke="#14263a" stroke-width=".1"/>
