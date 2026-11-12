@@ -714,19 +714,14 @@ button:focus-visible { outline: 3px solid var(--aviso); outline-offset: 2px; }
 .sendero-linea { stroke: #9aa6b2; stroke-width: 4px; stroke-dasharray: 10 12; }
 /* Lo que aún no ha llegado: un tramo corto de nubes por encima de la última época, sin nombres. */
 .zona-nubes { background: linear-gradient(#f3f6f8, #dfe7ee); }
-/* UX-34 (solo en la 1.0): el tramo de la época es su mapa largo (su proporción, en --alto). Ocupa el ancho de la pantalla, como mucho el
-   70 % del alto (unos 3 niveles por pantalla); en las pantallas anchas va centrado y a los lados, el mismo mapa difuminado. */
+/* UX-34 (solo en la 1.0): el tramo de la época es su mapa largo (su proporción, en --alto), con todo el ancho de la
+   pantalla también en la tablet: sin lados difuminados (JR, 12 de noviembre de 2026). La zona no recorta lo que sale (el
+   portal de la unión sale por arriba, sobre la época siguiente). */
 .zona-mapa { background: #7fa14a; overflow: visible; }
-/* La zona no recorta lo que sale (el portal de la unión sale por arriba, sobre la época siguiente), así que el
-   difuminado de los lados no puede sobresalir: ocupa la zona justa, sobre el verde, y se clarea un poco en los bordes. */
-.zona-mapa::before {
-  content: ""; position: absolute; inset: 0; background: var(--mapa, none) center / 100% 100%;
-  filter: blur(22px) saturate(.85) brightness(.92); pointer-events: none;
-}
 .mapa-columna {
-  position: relative; width: min(100%, 70vh); aspect-ratio: 1 / var(--alto, 5); margin: 0 auto;
+  position: relative; width: 100%; aspect-ratio: 1 / var(--alto, 5); margin: 0 auto;
   /* la franja de arriba (la luz del portal) se recorta: el margen en % va con el ancho de la pantalla, como la columna */
-  margin-top: calc(min(100%, 70vh) * var(--recorte, 0) * var(--alto, 5) * -1);
+  margin-top: calc(100% * var(--recorte, 0) * var(--alto, 5) * -1);
   background: var(--mapa, none) center / 100% 100%; container-type: inline-size;
 }
 /* Mapa provisional (hasta que llegue el pintado): hierba, camino de tierra, descansillos y niebla del portal */
@@ -769,23 +764,27 @@ button:focus-visible { outline: 3px solid var(--aviso); outline-offset: 2px; }
    imagen, así que el botón es algo mayor que el de CSS. El número va picado y pintado de blanco, como tallado y relleno
    de tiza (variante C, elegida por JR): sombra en el borde de arriba y luz en el de abajo. */
 .zona-mapa.con-piedras .nodo {
-  width: clamp(68px, 14.7cqw, 128px); height: clamp(68px, 14.7cqw, 128px);
+  /* En proporción al mapa, sin tope, para que la piedra tape su descansillo en el móvil y en la tablet (JR) */
+  width: max(68px, 17.4cqw); height: max(68px, 17.4cqw);
   background: var(--piedra) center / contain no-repeat; border: 0; border-radius: 50%; box-shadow: none;
   filter: drop-shadow(0 4px 3px rgba(40, 25, 10, .45));
 }
 /* Jerarquía (JR, 12 de noviembre de 2026): lo cerrado, apagado y más pequeño, para que no mande sobre el mapa; el
    nivel actual es el protagonista: la piedra abierta, mayor, con un aro de luz dorada que late y sin estrellas vacías. */
 .zona-mapa.con-piedras .nodo.cerrado {
-  width: clamp(54px, 11.5cqw, 100px); height: clamp(54px, 11.5cqw, 100px); background-image: var(--piedra-cerrada);
+  width: max(54px, 13.8cqw); height: max(54px, 13.8cqw); background-image: var(--piedra-cerrada);
   opacity: .72; filter: saturate(.6) brightness(1.12) drop-shadow(0 3px 2px rgba(40, 25, 10, .3));
 }
 .zona-mapa.con-piedras .nodo.cerrado .nodo-num svg { width: 36%; height: 36%; opacity: .8; }
 /* El aro del nivel actual: claro por dentro y dorado por fuera, para que se vea también sobre la hierba amarilla; la
    piedra ocupa el 85 % de su imagen, así que el aro va justo en su canto. */
-.zona-mapa.con-piedras .nodo.actual { width: clamp(84px, 17.6cqw, 150px); height: clamp(84px, 17.6cqw, 150px); }
+.zona-mapa.con-piedras .nodo.actual { width: max(84px, 21.5cqw); height: max(84px, 21.5cqw); }
+.zona-mapa.con-piedras .nodo-num { font-size: max(24px, 6.15cqw); }
+.zona-mapa.con-piedras .nodo.actual .nodo-num { font-size: max(30px, 7.7cqw); }
+.zona-mapa.con-piedras .nodo-avatar { width: max(64px, 16.4cqw); height: max(64px, 16.4cqw); }
 .zona-mapa.con-piedras .nodo.actual::before {
   content: ''; position: absolute; inset: 5%; border-radius: 50%; z-index: -1; pointer-events: none;
-  border: 3px solid #fff6c8; box-shadow: 0 0 0 3px #f2a91e, 0 0 16px 6px rgba(255, 200, 60, .85);
+  border: max(3px, .77cqw) solid #fff6c8; box-shadow: 0 0 0 max(3px, .77cqw) #f2a91e, 0 0 max(16px, 4.1cqw) max(6px, 1.5cqw) rgba(255, 200, 60, .85);
   animation: luz-actual 1.4s ease-in-out infinite;
 }
 @keyframes luz-actual { 0%, 100% { opacity: .75; } 50% { opacity: 1; } }
@@ -799,7 +798,7 @@ button:focus-visible { outline: 3px solid var(--aviso); outline-offset: 2px; }
 .zona-mapa.con-piedras .nodo-num svg.icono { color: #f3ead9; filter: drop-shadow(0 -1px 0 rgba(35, 25, 18, .85)) drop-shadow(0 1px 0 rgba(255, 245, 230, .35)); }
 .zona-mapa.con-piedras .nodo-estrellas { bottom: 2%; transform: translateY(55%); gap: 0; }
 .zona-mapa.con-piedras .nodo-estrellas i {
-  width: clamp(25px, 5.2cqw, 44px); height: clamp(25px, 5.2cqw, 44px); margin: 0 -3px; font-size: 0; color: transparent; text-shadow: none;
+  width: max(25px, 6.4cqw); height: max(25px, 6.4cqw); margin: 0 min(-3px, -.77cqw); font-size: 0; color: transparent; text-shadow: none;
   background: var(--estrella-vacia) center / contain no-repeat;
 }
 .zona-mapa.con-piedras .nodo-estrellas i.on { background-image: var(--estrella); }
