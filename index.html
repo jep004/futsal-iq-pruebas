@@ -741,7 +741,14 @@ button:focus-visible { outline: 3px solid var(--aviso); outline-offset: 2px; }
    de ancho (43 % del ancho). La imagen tiene 30 de sus 920 filas por debajo de la base del óvalo. */
 .mapa-portal-union {
   position: absolute; height: 46cqw; width: auto; transform: translate(-50%, -96.7%); z-index: 2; pointer-events: none;
-  filter: drop-shadow(0 0 2.5cqw rgba(110, 200, 255, .7));
+  /* Menos azul eléctrico y con un brillo cálido, para que pegue con la luz de tarde del mapa (JR, 12 de noviembre de
+     2026, variante A; tools/montaje_camino.py da el mismo retoque al portal de llegada, que va pintado en el mapa). */
+  filter: saturate(.7) hue-rotate(-14deg) brightness(1.05) drop-shadow(0 0 1.6cqw rgba(255, 214, 140, .75));
+}
+.mapa-portal-suelo {
+  position: absolute; width: 30cqw; height: 7cqw; transform: translate(-50%, -50%); border-radius: 50%; z-index: 1;
+  pointer-events: none; mix-blend-mode: screen;
+  background: radial-gradient(closest-side, rgba(255, 236, 170, .75), rgba(255, 210, 120, .35) 55%, transparent);
 }
 /* Piedras de los niveles (provisionales en CSS hasta que se aprueben las de ChatGPT, E139–E141) */
 .zona-mapa .nodo {
@@ -1501,7 +1508,7 @@ summary:focus-visible, input:focus-visible, select:focus-visible, textarea:focus
     aria-label="${v(d("como_jugar"))}">${l.actual?`<span class="nodo-avatar">${o.avatar}</span>`:""}<span class="nodo-num">${l.icono}</span></button>`:"")+a.niveles.map((_,L)=>wn(a,L,t(e.niveles[L]),o)).join(""),b=1024,u=Math.round(b*e.proporcion),m=[e.entrada,...e.tutorial?[e.tutorial]:[],...e.niveles,e.salida].map(([_,L])=>[_*b,L*u]),p=([_,L])=>`<ellipse class="mapa-portal-luz" cx="${_*b}" cy="${L*u}" rx="120" ry="140"/><ellipse class="mapa-portal" cx="${_*b}" cy="${L*u}" rx="62" ry="84"/>`,f=e.imagen?"":`<svg class="mapa-provisional" viewBox="0 0 ${b} ${u}" aria-hidden="true">
     <path class="mapa-camino-borde" d="${Je(m)}"/><path class="mapa-camino" d="${Je(m)}"/>
     ${m.slice(1,-1).map(([_,L])=>`<circle class="mapa-descansillo" cx="${_}" cy="${L}" r="64"/>`).join("")}
-    ${p(e.entrada)}${e.portal?"":p(e.salida)}</svg>`,g=e.portal?`<img class="mapa-portal-union" src="${e.portal}" alt="" aria-hidden="true" style="left:${(e.salida[0]*100).toFixed(1)}%;top:${(e.salida[1]*100).toFixed(2)}%">`:"",N=e.piedras,C=e.estrellas,x=N&&C?`;--piedra:url(${N.abierta});--piedra-cerrada:url(${N.cerrada});--piedra-actual:url(${N.actual});--estrella:url(${C.llena});--estrella-vacia:url(${C.vacia})`:"",j=r?d("portal_abierto",{epoca:i}):d("portal_cerrado",{epoca:i});return`<section class="zona zona-mapa${e.imagen?"":" provisional"}${x?" con-piedras":""}" style="--alto:${e.proporcion};--recorte:${e.recorte}${e.imagen?`;--mapa:url(${e.imagen})`:""}${x}" aria-label="${v(`${i}. ${j}`)}">
+    ${p(e.entrada)}${e.portal?"":p(e.salida)}</svg>`,g=e.portal?`<span class="mapa-portal-suelo" style="left:${(e.salida[0]*100).toFixed(1)}%;top:${(e.salida[1]*100).toFixed(2)}%"></span><img class="mapa-portal-union" src="${e.portal}" alt="" aria-hidden="true" style="left:${(e.salida[0]*100).toFixed(1)}%;top:${(e.salida[1]*100).toFixed(2)}%">`:"",N=e.piedras,C=e.estrellas,x=N&&C?`;--piedra:url(${N.abierta});--piedra-cerrada:url(${N.cerrada});--piedra-actual:url(${N.actual});--estrella:url(${C.llena});--estrella-vacia:url(${C.vacia})`:"",j=r?d("portal_abierto",{epoca:i}):d("portal_cerrado",{epoca:i});return`<section class="zona zona-mapa${e.imagen?"":" provisional"}${x?" con-piedras":""}" style="--alto:${e.proporcion};--recorte:${e.recorte}${e.imagen?`;--mapa:url(${e.imagen})`:""}${x}" aria-label="${v(`${i}. ${j}`)}">
     <div class="mapa-columna">${f}${g}${n}</div></section>`}function zn(a,e){let o=Ca.findIndex((i,t)=>e(t)&&!(a[i.id]>0));if(o>=0)return o;let r=0;return Ca.forEach((i,t)=>{e(t)&&(r=t)}),r}function Xn(a){let e=[],o=[...io].sort((r,i)=>va(r)-va(i));for(let r of o){let i=r.niveles.length,t=Vn+(i-1)*kn+Hn,l=f=>t-Vn-f*kn,c=E($a[va(r)].nombre),n=r.niveles.every(f=>(a.estrellas[f.id]??0)>0),b=Ke[r.epoca??""];if(b){e.push(Lb(r,b,a,n,c));continue}let u=r.niveles.map((f,g)=>wn(r,g,`left:${Sn(G.indexOf(f)).toFixed(1)}%;top:${l(g)}px`,a)).join(""),m=Hn*.45,p=[[50,t],...r.niveles.map((f,g)=>[Sn(G.indexOf(f)),l(g)]),[50,m],[50,0]];e.push(`<section class="zona" style="height:${t}px" aria-label="${v(c)}"><div class="pista-camino">
       ${Dn(t,p)}${u}${Rb(m,n,n&&!!a.portalNuevo?.(r.id),c)}</div></section>`)}return o.length<$a.length&&e.push(`<section class="zona zona-nubes" style="height:${Ze}px" aria-label="${v(d("pronto"))}"><div class="pista-camino">
       ${Dn(Ze,[[50,Ze],[50,Ze*.4]],"en-nubes")}</div>
