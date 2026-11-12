@@ -772,8 +772,8 @@ button:focus-visible { outline: 3px solid var(--aviso); outline-offset: 2px; }
 /* Jerarquía (JR, 12 de noviembre de 2026): lo cerrado, apagado y más pequeño, para que no mande sobre el mapa; el
    nivel actual es el protagonista: la piedra abierta, mayor, con un aro de luz dorada que late y sin estrellas vacías. */
 .zona-mapa.con-piedras .nodo.cerrado {
-  width: max(54px, 13.8cqw); height: max(54px, 13.8cqw); background-image: var(--piedra-cerrada);
-  opacity: .72; filter: saturate(.6) brightness(1.12) drop-shadow(0 3px 2px rgba(40, 25, 10, .3));
+  background-image: var(--piedra-cerrada); /* del mismo tamaño que las abiertas, para que tapen su descansillo (JR) */
+  opacity: .85; filter: saturate(.6) brightness(1.12) drop-shadow(0 3px 2px rgba(40, 25, 10, .3));
 }
 .zona-mapa.con-piedras .nodo.cerrado .nodo-num svg { width: 36%; height: 36%; opacity: .8; }
 /* El aro del nivel actual: claro por dentro y dorado por fuera, para que se vea también sobre la hierba amarilla; la
